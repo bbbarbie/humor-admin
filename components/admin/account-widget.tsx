@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AccountWidgetProps = {
@@ -9,7 +8,6 @@ type AccountWidgetProps = {
 };
 
 export function AccountWidget({ email }: AccountWidgetProps) {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const normalizedEmail = email?.trim() ? email : "Unknown user";
@@ -17,13 +15,9 @@ export function AccountWidget({ email }: AccountWidgetProps) {
 
   async function handleLogout() {
     setIsLoading(true);
-
-    try {
-      const supabase = createSupabaseBrowserClient();
-      await supabase.auth.signOut();
-    } finally {
-      router.replace("/login");
-    }
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    window.location.href = "/login";
   }
 
   return (
