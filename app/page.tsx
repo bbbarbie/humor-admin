@@ -11,12 +11,14 @@ export default function Home() {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/login"
+            prefetch={false}
             className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
           >
             Login with Google
           </Link>
           <Link
             href="/admin"
+            prefetch={false}
             className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium"
           >
             Go to Admin Dashboard

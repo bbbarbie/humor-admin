@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AccountWidgetProps = {
   email?: string | null;
@@ -19,6 +19,7 @@ export function AccountWidget({ email }: AccountWidgetProps) {
     setIsLoading(true);
 
     try {
+      const supabase = createSupabaseBrowserClient();
       await supabase.auth.signOut();
     } finally {
       router.replace("/login");

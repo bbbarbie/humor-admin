@@ -2,20 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (user) {
-        router.replace("/admin");
+        if (user) {
+          router.replace("/admin");
+        }
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : "Unable to initialize login.");
       }
     }
 
@@ -24,17 +30,24 @@ export default function LoginPage() {
 
   async function continueWithGoogle() {
     setLoading(true);
+    setErrorMessage(null);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-    if (error) {
+      if (error) {
+        setErrorMessage(error.message);
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to start Google sign-in.");
+    } finally {
       setLoading(false);
-      alert(error.message);
     }
   }
 
@@ -45,6 +58,11 @@ export default function LoginPage() {
         <p className="mt-2 text-sm text-zinc-600">
           Continue with Google to access the admin dashboard.
         </p>
+        {errorMessage ? (
+          <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+            {errorMessage}
+          </p>
+        ) : null}
 
         <button
           type="button"

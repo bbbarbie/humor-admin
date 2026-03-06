@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
   ADMIN_ALERT_ERROR,
   ADMIN_INPUT,
@@ -38,26 +38,34 @@ export default function AdminUsersPage() {
     async function loadUsers() {
       setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, email, is_superadmin")
-        .order("first_name", { ascending: true });
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email, is_superadmin")
+          .order("first_name", { ascending: true });
 
-      if (!isMounted) return;
+        if (!isMounted) return;
 
-      if (error) {
-        setErrorMessage(error.message);
+        if (error) {
+          setErrorMessage(error.message);
+          setUsers([]);
+        } else {
+          const sourceRows = Array.isArray(data) ? data : [];
+          const rows = sourceRows.map((row) => ({
+            id: String(row.id),
+            first_name: (row.first_name as string | null) ?? null,
+            last_name: (row.last_name as string | null) ?? null,
+            email: (row.email as string | null) ?? null,
+            is_superadmin: (row.is_superadmin as boolean | null) ?? null,
+          }));
+          setUsers(rows);
+          setErrorMessage(null);
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        setErrorMessage(error instanceof Error ? error.message : "Failed to load users.");
         setUsers([]);
-      } else {
-        const rows = (data ?? []).map((row) => ({
-          id: String(row.id),
-          first_name: (row.first_name as string | null) ?? null,
-          last_name: (row.last_name as string | null) ?? null,
-          email: (row.email as string | null) ?? null,
-          is_superadmin: (row.is_superadmin as boolean | null) ?? null,
-        }));
-        setUsers(rows);
-        setErrorMessage(null);
       }
 
       setIsLoading(false);

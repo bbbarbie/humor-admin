@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function LogoutAndTryDifferentEmailButton() {
   const router = useRouter();
@@ -11,8 +11,12 @@ export default function LogoutAndTryDifferentEmailButton() {
   async function handleLogout() {
     setIsLoading(true);
 
-    await supabase.auth.signOut();
-    router.replace("/login");
+    try {
+      const supabase = createSupabaseBrowserClient();
+      await supabase.auth.signOut();
+    } finally {
+      router.replace("/login");
+    }
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -12,6 +12,7 @@ export function LogoutButton() {
     setIsLoading(true);
 
     try {
+      const supabase = createSupabaseBrowserClient();
       await supabase.auth.signOut();
     } finally {
       router.replace("/login");

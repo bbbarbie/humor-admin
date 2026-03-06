@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ADMIN_INPUT,
   ADMIN_PANEL,
@@ -48,6 +48,7 @@ export function CreateImageForm({
   const [count, setCount] = useState<GenerateImageInput["count"]>(2);
   const [candidates, setCandidates] = useState<GeneratedImageCandidate[]>([]);
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeTabClasses = useMemo(
     () =>
@@ -75,7 +76,7 @@ export function CreateImageForm({
       await onUploadFile(file);
       setFile(null);
 
-      const input = document.getElementById("create-image-file") as HTMLInputElement | null;
+      const input = fileInputRef.current;
       if (input) {
         input.value = "";
       }
@@ -100,9 +101,15 @@ export function CreateImageForm({
       size,
       count,
     });
+    const safeGenerated = Array.isArray(generated)
+      ? generated.filter(
+          (candidate): candidate is GeneratedImageCandidate =>
+            Boolean(candidate?.id) && typeof candidate.url === "string" && candidate.url.trim().length > 0,
+        )
+      : [];
 
-    setCandidates(generated);
-    setSelectedCandidateId(generated[0]?.id ?? null);
+    setCandidates(safeGenerated);
+    setSelectedCandidateId(safeGenerated[0]?.id ?? null);
   }
 
   const isSubmitDisabled =
@@ -159,6 +166,7 @@ export function CreateImageForm({
           <span className="text-sm font-medium text-slate-300">Image File</span>
           <input
             id="create-image-file"
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             required

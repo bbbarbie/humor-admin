@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase/browser";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
   CreateImageForm,
   type GenerateImageInput,
@@ -60,7 +60,7 @@ function sanitizeFileName(name: string): string {
 }
 
 export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) {
-  const [rows, setRows] = useState<ImageRow[]>(initialRows);
+  const [rows, setRows] = useState<ImageRow[]>(Array.isArray(initialRows) ? initialRows : []);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -136,6 +136,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
       const extension = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
       const fileName = `${Date.now()}-${crypto.randomUUID()}-${sanitizeFileName(file.name.replace(/\.[^.]+$/, ""))}.${extension}`;
       const path = `admin-uploads/${fileName}`;
+      const supabase = createSupabaseBrowserClient();
 
       const upload = await supabase.storage.from(IMAGE_BUCKET).upload(path, file, {
         cacheControl: "3600",
