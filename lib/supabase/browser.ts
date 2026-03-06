@@ -1,16 +1,18 @@
+"use client";
+
 import { createBrowserClient } from "@supabase/ssr";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const supabaseAnonKey: string = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
 
 if (!supabaseUrl) {
   throw new Error("Missing env variable: NEXT_PUBLIC_SUPABASE_URL");
 }
 
-if (!supabasePublishableKey) {
-  throw new Error("Missing env variable: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+if (!supabaseAnonKey) {
+  throw new Error("Missing env variable: NEXT_PUBLIC_SUPABASE_ANON_KEY");
 }
 
 export function createSupabaseBrowserClient() {
-  return createBrowserClient(supabaseUrl, supabasePublishableKey);
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
