@@ -1,14 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-if (!supabaseUrl || !supabasePublishableKey) {
-  throw new Error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-  );
+function getEnv(
+  name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing env variable: ${name}`);
+  }
+  return value;
 }
+
+const supabaseUrl = getEnv("NEXT_PUBLIC_SUPABASE_URL");
+const supabasePublishableKey = getEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
