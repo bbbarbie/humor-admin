@@ -21,7 +21,7 @@ export function AccountWidget({ email }: AccountWidgetProps) {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 w-72 rounded-2xl border border-slate-500/20 bg-[rgba(15,23,42,0.8)] p-3.5 shadow-xl shadow-cyan-500/10 backdrop-blur-md transition-all duration-200">
+    <div className="w-full rounded-2xl border border-slate-700/40 bg-slate-900/80 p-4 shadow-lg shadow-slate-950/30 backdrop-blur-md">
       <div className="flex items-start gap-3">
         <div className="rounded-full bg-[linear-gradient(135deg,#22d3ee,#3b82f6,#8b5cf6)] p-[1.5px] shadow-lg shadow-cyan-400/30">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-slate-100">
@@ -29,7 +29,7 @@ export function AccountWidget({ email }: AccountWidgetProps) {
           </div>
         </div>
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-300">Signed In</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signed In</p>
           <p className="mt-1 truncate text-sm font-medium text-slate-100">{normalizedEmail}</p>
         </div>
       </div>
@@ -38,7 +38,7 @@ export function AccountWidget({ email }: AccountWidgetProps) {
         type="button"
         onClick={() => void handleLogout()}
         disabled={isLoading}
-        className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-slate-600/60 bg-slate-900/70 px-3 py-2 text-sm font-medium text-slate-200 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/60 hover:bg-[rgba(59,130,246,0.15)] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-slate-700/50 bg-slate-900/70 px-4 py-2.5 text-sm font-semibold text-slate-200 transition-all duration-200 hover:bg-slate-800/70 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Signing out..." : "Log out"}
       </button>

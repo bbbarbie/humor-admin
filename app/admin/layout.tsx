@@ -27,22 +27,30 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(135deg,#0f172a,#1e293b)] text-slate-200">
-      <div className="mx-auto grid min-h-screen max-w-7xl grid-cols-1 gap-6 px-4 py-4 md:grid-cols-[260px_1fr] md:px-6 md:py-6">
-        <aside className="sticky top-4 h-fit rounded-3xl border border-slate-500/20 bg-[rgba(15,23,42,0.72)] p-6 shadow-lg shadow-cyan-500/10 backdrop-blur-md transition-all duration-200">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">Admin Panel</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-wide text-slate-100">Humor HQ</h1>
-            <p className="mt-2 text-sm text-slate-400">Monitor content, trends, and moderation at a glance.</p>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.2),transparent_45%),linear-gradient(135deg,#020617,#0f172a_52%,#111827)] text-slate-200">
+      <div className="mx-auto grid min-h-screen max-w-[1600px] grid-cols-1 gap-6 px-4 py-4 md:grid-cols-[260px_1fr] md:px-6 md:py-6">
+        <aside className="h-screen overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-900/70 p-6 shadow-lg shadow-slate-950/30 backdrop-blur-md md:sticky md:top-0">
+          <div className="flex h-full min-h-0 flex-col">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">Admin Panel</p>
+              <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-100">Humor HQ</h1>
+              <p className="mt-2 text-sm text-slate-400">Monitor content, trends, and moderation at a glance.</p>
+            </div>
+            <div className="mt-8 min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+              <AdminSidebarNav />
+            </div>
+            <div className="mt-4 shrink-0 border-t border-slate-700/40 pt-4">
+              <AccountWidget email={user.email} />
+            </div>
           </div>
-          <AdminSidebarNav />
         </aside>
 
-        <main className="rounded-3xl border border-slate-500/20 bg-[rgba(15,23,42,0.7)] p-5 shadow-xl shadow-cyan-500/10 backdrop-blur-md transition-all duration-200 md:p-7">
-          {children}
+        <main className="min-w-0">
+          <div className="mx-auto w-full max-w-7xl px-6 py-8">
+            {children}
+          </div>
         </main>
       </div>
-      <AccountWidget email={user.email} />
     </div>
   );
 }

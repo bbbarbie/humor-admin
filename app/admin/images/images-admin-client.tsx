@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { formatUtc } from "@/lib/format-utc";
 import {
   CreateImageForm,
   type GenerateImageInput,
@@ -9,13 +10,16 @@ import {
 } from "@/components/admin/create-image-form";
 import { ImageThumbnail } from "@/components/admin/image-thumbnail";
 import {
+  ADMIN_DANGER_BUTTON,
   ADMIN_ALERT_ERROR,
   ADMIN_ALERT_SUCCESS,
   ADMIN_INPUT,
   ADMIN_PANEL,
   ADMIN_PRIMARY_BUTTON,
-  ADMIN_SECONDARY_BUTTON,
+  ADMIN_TABLE_ACTION_PRIMARY,
+  ADMIN_TABLE_ACTION_SECONDARY,
   ADMIN_TABLE_HEAD,
+  ADMIN_TABLE_ROW,
   ADMIN_TABLE_WRAPPER,
 } from "@/components/admin/theme";
 
@@ -42,13 +46,6 @@ type ApiError = {
 type GenerateImagesSuccess = {
   images?: GeneratedImageCandidate[];
 };
-
-function toReadableUtc(value: string | null): string {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return `${date.toLocaleString("en-US", { timeZone: "UTC", hour12: false })} UTC`;
-}
 
 function truncateUrl(url: string, max = 60): string {
   if (url.length <= max) return url;
@@ -257,7 +254,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="text-lg font-semibold text-slate-100">Create Image</h3>
-            <p className="text-xs text-slate-400">Choose URL, upload, or generated candidate.</p>
+            <p className="mt-1 text-sm text-slate-400">Choose URL, upload, or generated candidate.</p>
           </div>
           <button
             type="button"
@@ -305,9 +302,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
               return (
                 <tr
                   key={rowId}
-                  className={`align-top transition-colors duration-150 hover:bg-slate-800/70 ${
-                    index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-900/60"
-                  }`}
+                  className={`${ADMIN_TABLE_ROW} ${index % 2 === 0 ? "bg-slate-900/40" : "bg-slate-900/20"}`}
                 >
                   <td className="px-4 py-3.5">
                     <ImageThumbnail url={row.url} alt={`Image ${rowId}`} className="h-14 w-14" />
@@ -335,8 +330,8 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
                       <span className="text-slate-400">-</span>
                     )}
                   </td>
-                  <td className="px-4 py-3.5 text-slate-300">{toReadableUtc(row.created_datetime_utc)}</td>
-                  <td className="px-4 py-3.5 text-slate-300">{toReadableUtc(row.modified_datetime_utc)}</td>
+                  <td className="px-4 py-3.5 text-slate-300">{formatUtc(row.created_datetime_utc)}</td>
+                  <td className="px-4 py-3.5 text-slate-300">{formatUtc(row.modified_datetime_utc)}</td>
                   <td className="px-4 py-3.5">
                     <div className="flex flex-wrap items-center gap-2">
                       {isEditing ? (
@@ -345,7 +340,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
                             type="button"
                             onClick={() => void handleSaveEdit(row.id)}
                             disabled={isSavingRow}
-                            className={ADMIN_PRIMARY_BUTTON.replace("rounded-xl px-4 py-2 text-sm", "rounded-lg px-3 py-1.5 text-xs")}
+                            className={ADMIN_TABLE_ACTION_PRIMARY}
                           >
                             {isSavingRow ? "Saving..." : "Save"}
                           </button>
@@ -355,10 +350,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
                               setEditingId(null);
                               setEditingUrl("");
                             }}
-                            className={ADMIN_SECONDARY_BUTTON.replace(
-                              "rounded-xl px-4 py-2 text-sm",
-                              "rounded-lg px-3 py-1.5 text-xs",
-                            )}
+                            className={ADMIN_TABLE_ACTION_SECONDARY}
                           >
                             Cancel
                           </button>
@@ -371,10 +363,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
                             setEditingUrl(row.url ?? "");
                             setErrorMessage(null);
                           }}
-                          className={ADMIN_SECONDARY_BUTTON.replace(
-                            "rounded-xl px-4 py-2 text-sm",
-                            "rounded-lg px-3 py-1.5 text-xs",
-                          )}
+                          className={ADMIN_TABLE_ACTION_SECONDARY}
                         >
                           Edit
                         </button>
@@ -384,7 +373,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
                         type="button"
                         onClick={() => void handleDelete(row.id)}
                         disabled={isDeletingRow}
-                        className="rounded-lg border border-rose-400/40 bg-rose-950/50 px-3 py-1.5 text-xs font-semibold text-rose-200 transition-colors hover:bg-rose-900/60 disabled:cursor-not-allowed disabled:opacity-60"
+                        className={ADMIN_DANGER_BUTTON}
                       >
                         {isDeletingRow ? "Deleting..." : "Delete"}
                       </button>

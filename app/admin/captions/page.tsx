@@ -1,19 +1,20 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ImageThumbnail } from "@/components/admin/image-thumbnail";
 import {
+  ADMIN_BADGE_INFO,
+  ADMIN_BADGE_NEUTRAL,
+  ADMIN_BADGE_POSITIVE,
   ADMIN_ALERT_ERROR,
   ADMIN_INPUT,
-  ADMIN_PAGE_HEADER,
-  ADMIN_PAGE_SUBTITLE,
-  ADMIN_PAGE_TITLE,
   ADMIN_PANEL,
   ADMIN_PRIMARY_BUTTON,
   ADMIN_SECONDARY_BUTTON,
   ADMIN_SELECT,
-  ADMIN_STAT_CARD,
   ADMIN_TABLE_HEAD,
+  ADMIN_TABLE_ROW,
   ADMIN_TABLE_WRAPPER,
 } from "@/components/admin/theme";
+import { AdminPageHeader, AdminPageShell, AdminStatCard } from "@/components/admin/ui";
 
 type PrimitiveId = string | number;
 
@@ -42,15 +43,6 @@ function readVisibility(value: string | string[] | undefined): VisibilityFilter 
   if (normalized === "public") return "public";
   if (normalized === "private") return "private";
   return "all";
-}
-
-function StatCard({ title, value }: { title: string; value: string }) {
-  return (
-    <div className={ADMIN_STAT_CARD}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-1 text-2xl font-bold tracking-tight text-slate-100">{value}</p>
-    </div>
-  );
 }
 
 export default async function AdminCaptionsPage({
@@ -119,11 +111,8 @@ export default async function AdminCaptionsPage({
   const totalLikes = rows.reduce((sum, row) => sum + (row.like_count ?? 0), 0);
 
   return (
-    <section className="space-y-6">
-      <div className={ADMIN_PAGE_HEADER}>
-        <h2 className={ADMIN_PAGE_TITLE}>Captions</h2>
-        <p className={ADMIN_PAGE_SUBTITLE}>Moderate caption records with linked image previews.</p>
-      </div>
+    <AdminPageShell>
+      <AdminPageHeader title="Captions" subtitle="Moderate caption records with linked image previews." />
 
       <form className={ADMIN_PANEL}>
         <div className="grid gap-3 md:grid-cols-2">
@@ -163,10 +152,10 @@ export default async function AdminCaptionsPage({
       ) : null}
 
       <div className="grid gap-3 md:grid-cols-4">
-        <StatCard title="Total Captions" value={totalCaptions.toLocaleString()} />
-        <StatCard title="Public Captions" value={publicCaptions.toLocaleString()} />
-        <StatCard title="Private Captions" value={privateCaptions.toLocaleString()} />
-        <StatCard title="Total Likes" value={totalLikes.toLocaleString()} />
+        <AdminStatCard title="Total Captions" value={totalCaptions.toLocaleString()} />
+        <AdminStatCard title="Public Captions" value={publicCaptions.toLocaleString()} />
+        <AdminStatCard title="Private Captions" value={privateCaptions.toLocaleString()} />
+        <AdminStatCard title="Total Likes" value={totalLikes.toLocaleString()} />
       </div>
 
       <div className={ADMIN_TABLE_WRAPPER}>
@@ -189,9 +178,7 @@ export default async function AdminCaptionsPage({
               return (
                 <tr
                   key={rowKey}
-                  className={`align-top transition-colors duration-150 hover:bg-slate-800/70 ${
-                    index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-900/60"
-                  }`}
+                  className={`${ADMIN_TABLE_ROW} ${index % 2 === 0 ? "bg-slate-900/40" : "bg-slate-900/20"}`}
                 >
                   <td className="px-4 py-3.5">
                     <ImageThumbnail
@@ -214,19 +201,13 @@ export default async function AdminCaptionsPage({
                     {row.profile_id ?? "-"}
                   </td>
                   <td className="px-4 py-3.5">
-                    <span className="inline-flex rounded-full border border-fuchsia-400/35 bg-fuchsia-950/45 px-2.5 py-1 text-xs font-semibold text-fuchsia-200">
-                      {row.like_count ?? 0} likes
-                    </span>
+                    <span className={ADMIN_BADGE_INFO}>{row.like_count ?? 0} likes</span>
                   </td>
                   <td className="px-4 py-3.5">
                     {row.is_public === true ? (
-                      <span className="inline-flex rounded-full border border-emerald-400/30 bg-emerald-950/50 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-                        Public
-                      </span>
+                      <span className={ADMIN_BADGE_POSITIVE}>Public</span>
                     ) : (
-                      <span className="inline-flex rounded-full border border-slate-600/60 bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-slate-300">
-                        Private
-                      </span>
+                      <span className={ADMIN_BADGE_NEUTRAL}>Private</span>
                     )}
                   </td>
                 </tr>
@@ -243,6 +224,6 @@ export default async function AdminCaptionsPage({
           </tbody>
         </table>
       </div>
-    </section>
+    </AdminPageShell>
   );
 }

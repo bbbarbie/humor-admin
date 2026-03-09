@@ -1,17 +1,16 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { formatUtc } from "@/lib/format-utc";
 import {
   ADMIN_ALERT_ERROR,
   ADMIN_INPUT,
-  ADMIN_PAGE_HEADER,
-  ADMIN_PAGE_SUBTITLE,
-  ADMIN_PAGE_TITLE,
   ADMIN_PANEL,
   ADMIN_PRIMARY_BUTTON,
   ADMIN_SECONDARY_BUTTON,
-  ADMIN_STAT_CARD,
   ADMIN_TABLE_HEAD,
+  ADMIN_TABLE_ROW,
   ADMIN_TABLE_WRAPPER,
 } from "@/components/admin/theme";
+import { AdminPageHeader, AdminPageShell, AdminStatCard } from "@/components/admin/ui";
 
 type GenericRow = Record<string, unknown>;
 
@@ -22,22 +21,11 @@ function readQueryValue(value: string | string[] | undefined): string {
 
 function formatTime(value: unknown): string {
   if (typeof value !== "string" || !value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return `${date.toLocaleString("en-US", { timeZone: "UTC", hour12: false })} UTC`;
+  return formatUtc(value);
 }
 
 function statValue(value: number | null): string {
   return value === null ? "-" : value.toLocaleString();
-}
-
-function StatCard({ title, value }: { title: string; value: string }) {
-  return (
-    <div className={ADMIN_STAT_CARD}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-1 text-2xl font-bold tracking-tight text-slate-100">{value}</p>
-    </div>
-  );
 }
 
 export default async function AdminVotesPage({
@@ -116,11 +104,8 @@ export default async function AdminVotesPage({
     : null;
 
   return (
-    <section className="space-y-6">
-      <div className={ADMIN_PAGE_HEADER}>
-        <h2 className={ADMIN_PAGE_TITLE}>Votes</h2>
-        <p className={ADMIN_PAGE_SUBTITLE}>Inspect caption voting activity.</p>
-      </div>
+    <AdminPageShell>
+      <AdminPageHeader title="Votes" subtitle="Inspect caption voting activity." />
 
       <form className={ADMIN_PANEL}>
         <label className="space-y-1.5">
@@ -151,9 +136,9 @@ export default async function AdminVotesPage({
       ) : null}
 
       <div className="grid gap-3 md:grid-cols-3">
-        <StatCard title="Total Votes" value={statValue(totalVotes)} />
-        <StatCard title="Unique Voters" value={statValue(uniqueVoters)} />
-        <StatCard title="Unique Captions Voted On" value={statValue(uniqueCaptions)} />
+        <AdminStatCard title="Total Votes" value={statValue(totalVotes)} />
+        <AdminStatCard title="Unique Voters" value={statValue(uniqueVoters)} />
+        <AdminStatCard title="Unique Captions Voted On" value={statValue(uniqueCaptions)} />
       </div>
 
       <div className={ADMIN_TABLE_WRAPPER}>
@@ -176,9 +161,7 @@ export default async function AdminVotesPage({
               return (
                 <tr
                   key={rowId}
-                  className={`align-top transition-colors duration-150 hover:bg-slate-800/70 ${
-                    index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-900/60"
-                  }`}
+                  className={`${ADMIN_TABLE_ROW} ${index % 2 === 0 ? "bg-slate-900/40" : "bg-slate-900/20"}`}
                 >
                   <td className="px-4 py-3.5 font-mono text-xs text-slate-300">{row.id ? String(row.id) : "-"}</td>
                   <td className="px-4 py-3.5 font-mono text-xs text-slate-300">
@@ -205,6 +188,6 @@ export default async function AdminVotesPage({
           </tbody>
         </table>
       </div>
-    </section>
+    </AdminPageShell>
   );
 }

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ImageThumbnail } from "@/components/admin/image-thumbnail";
+import { ADMIN_ALERT_ERROR, ADMIN_PAGE_HEADER, ADMIN_PAGE_SUBTITLE, ADMIN_PAGE_TITLE, ADMIN_STAT_CARD } from "@/components/admin/theme";
+import { AdminPageShell } from "@/components/admin/ui";
 
 const PAGE_SIZE = 1000;
 
@@ -133,10 +135,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-700/40 bg-[rgba(15,23,42,0.7)] p-5 shadow-lg shadow-cyan-500/10 backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-cyan-500/20">
+    <section className="rounded-2xl border border-slate-700/40 bg-slate-900/70 p-6 shadow-lg shadow-slate-950/30 backdrop-blur-md">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-wide text-blue-300">{title}</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-100">{title}</h2>
           {subtitle ? <p className="mt-1 text-sm text-slate-400">{subtitle}</p> : null}
         </div>
         {action}
@@ -157,17 +159,17 @@ function StatCard({
   label: string;
   value: string;
   note?: string;
-  glowClass: string;
+  glowClass?: string;
 }) {
   return (
     <div
-      className={`group rounded-2xl border border-slate-700/40 bg-[rgba(15,23,42,0.7)] p-4 shadow-lg backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
+      className={`group ${ADMIN_STAT_CARD} ${glowClass ?? ""}`}
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-200">{label}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</p>
         <span className="text-lg leading-none transition-transform duration-200 group-hover:scale-110">{icon}</span>
       </div>
-      <p className="mt-2 text-3xl font-semibold tracking-wide text-slate-100">{value}</p>
+      <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-100">{value}</p>
       {note ? <p className="mt-1 text-xs text-slate-400">{note}</p> : null}
     </div>
   );
@@ -326,72 +328,72 @@ export default async function AdminDashboardPage() {
       value: fmtInt(totalProfiles),
       icon: "🧑‍🤝‍🧑",
       note: "All user profile records",
-      glowClass: "hover:border-blue-400/50 hover:shadow-blue-500/20",
+      glowClass: "",
     },
     {
       label: "Total Images",
       value: fmtInt(totalImages),
       icon: "🖼️",
       note: "Meme canvas inventory",
-      glowClass: "hover:border-violet-400/50 hover:shadow-violet-500/20",
+      glowClass: "",
     },
     {
       label: "Total Captions",
       value: fmtInt(totalCaptions),
       icon: "✍️",
       note: "Written punchlines so far",
-      glowClass: "hover:border-cyan-400/50 hover:shadow-cyan-500/20",
+      glowClass: "",
     },
     {
       label: "Total Votes Cast",
       value: fmtInt(totalVotes),
       icon: "🗳️",
       note: "Community reactions logged",
-      glowClass: "hover:border-blue-400/50 hover:shadow-blue-500/20",
+      glowClass: "",
     },
     {
       label: "Superadmins",
       value: fmtInt(superadmins),
       icon: "🛡️",
       note: "Accounts with elevated access",
-      glowClass: "hover:border-violet-400/50 hover:shadow-violet-500/20",
+      glowClass: "",
     },
     {
       label: "Non-superadmins",
       value: fmtInt(nonSuperadmins),
       icon: "👥",
       note: "Everyone else",
-      glowClass: "hover:border-slate-500/50 hover:shadow-slate-500/20",
+      glowClass: "",
     },
     {
       label: "Avg Captions / Image",
       value: fmtAvg(avgCaptionsPerImage),
       icon: "📈",
       note: "Caption density ratio",
-      glowClass: "hover:border-blue-400/50 hover:shadow-blue-500/20",
+      glowClass: "",
     },
     {
       label: "Avg Votes / Caption",
       value: fmtAvg(avgVotesPerCaption),
       icon: "🎯",
       note: "Vote intensity score",
-      glowClass: "hover:border-violet-400/50 hover:shadow-violet-500/20",
+      glowClass: "",
     },
   ];
 
   return (
-    <div className="space-y-6">
-      <header className="rounded-2xl border border-slate-700/40 bg-[linear-gradient(135deg,rgba(59,130,246,0.14),rgba(139,92,246,0.12))] p-6 shadow-lg shadow-cyan-500/10 backdrop-blur-md">
+    <AdminPageShell className="space-y-6">
+      <header className={ADMIN_PAGE_HEADER}>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">Admin Dashboard</p>
-        <h1 className="mt-1 text-4xl font-semibold tracking-wide text-slate-100">System Overview</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-300">
+        <h1 className={ADMIN_PAGE_TITLE}>System Overview</h1>
+        <p className={`${ADMIN_PAGE_SUBTITLE} max-w-2xl`}>
           A playful command center for profiles, image activity, caption trends, and voting energy.
         </p>
         <p className="mt-3 text-xs text-slate-400">Last updated: just now</p>
       </header>
 
       {issues.length > 0 ? (
-        <div className="rounded-2xl border border-amber-300/40 bg-amber-500/10 p-3 text-sm text-amber-100">
+        <div className={ADMIN_ALERT_ERROR}>
           Some metrics were partially unavailable. The dashboard is showing everything that could be computed.
         </div>
       ) : null}
@@ -429,14 +431,14 @@ export default async function AdminDashboardPage() {
                   return (
                     <div
                       key={`${row.captionId}-${row.rank}`}
-                      className={`grid grid-cols-[56px_56px_1fr_auto] items-center gap-3 rounded-xl border p-3 transition-all duration-200 hover:-translate-y-0.5 ${
+                      className={`grid grid-cols-[56px_56px_1fr_auto] items-center gap-3 rounded-xl border p-3 transition-all duration-200 ${
                         row.rank === 1
                           ? "border-amber-300/60 bg-amber-500/10 shadow-lg shadow-amber-400/25"
-                          : row.rank === 2
+                        : row.rank === 2
                             ? "border-slate-300/60 bg-slate-400/10 shadow-lg shadow-slate-300/20"
                             : row.rank === 3
                               ? "border-orange-400/60 bg-orange-500/10 shadow-lg shadow-orange-400/20"
-                              : "border-slate-700/40 bg-slate-800/40 hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/15"
+                              : "border-slate-700/40 bg-slate-800/40"
                       }`}
                     >
                       <div className="text-center text-sm font-semibold text-slate-200">{trophy}</div>
@@ -504,7 +506,7 @@ export default async function AdminDashboardPage() {
                   return (
                     <div
                       key={row.imageId}
-                      className="flex items-center gap-3 rounded-xl border border-slate-700/40 bg-slate-800/40 p-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/15"
+                      className="flex items-center gap-3 rounded-xl border border-slate-700/40 bg-slate-800/40 p-2.5 transition-all duration-200"
                     >
                       <div className="w-6 text-center text-xs font-semibold text-blue-300">#{row.rank}</div>
                       <ImageThumbnail url={preview} alt={`Image ${row.imageId}`} className="h-10 w-10" fallbackLabel="N/A" />
@@ -566,6 +568,6 @@ export default async function AdminDashboardPage() {
           </Section>
         </div>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

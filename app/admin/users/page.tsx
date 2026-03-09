@@ -3,17 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
+  ADMIN_BADGE_NEUTRAL,
+  ADMIN_BADGE_POSITIVE,
   ADMIN_ALERT_ERROR,
-  ADMIN_INPUT,
-  ADMIN_PAGE_HEADER,
-  ADMIN_PAGE_SUBTITLE,
-  ADMIN_PAGE_TITLE,
   ADMIN_PANEL,
-  ADMIN_PRIMARY_BUTTON,
-  ADMIN_SECONDARY_BUTTON,
+  ADMIN_PILL_TAB_ACTIVE,
+  ADMIN_PILL_TAB_BASE,
+  ADMIN_PILL_TAB_INACTIVE,
+  ADMIN_TABLE_ROW,
   ADMIN_TABLE_HEAD,
-  ADMIN_TABLE_WRAPPER,
 } from "@/components/admin/theme";
+import { AdminPageHeader, AdminPageShell, AdminSearchInput, AdminTableWrapper } from "@/components/admin/ui";
 
 type UserRow = {
   id: string;
@@ -101,27 +101,22 @@ export default function AdminUsersPage() {
   }, [roleFilter, searchQuery, users]);
 
   const filterButtonClass = (value: RoleFilter) =>
-    `rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-200 ${
+    `${ADMIN_PILL_TAB_BASE} ${
       roleFilter === value
-        ? ADMIN_PRIMARY_BUTTON.replace("px-4 py-2 text-sm", "px-3 py-2 text-sm")
-        : ADMIN_SECONDARY_BUTTON.replace("px-4 py-2 text-sm", "px-3 py-2 text-sm")
+        ? ADMIN_PILL_TAB_ACTIVE
+        : ADMIN_PILL_TAB_INACTIVE
     }`;
 
   return (
-    <section className="space-y-6">
-      <div className={ADMIN_PAGE_HEADER}>
-        <h2 className={ADMIN_PAGE_TITLE}>Users</h2>
-        <p className={ADMIN_PAGE_SUBTITLE}>Search and filter profile records quickly.</p>
-      </div>
+    <AdminPageShell>
+      <AdminPageHeader title="Users" subtitle="Search and filter profile records quickly." />
 
       {errorMessage ? (
-        <p className={ADMIN_ALERT_ERROR}>
-          Failed to load users: {errorMessage}
-        </p>
+        <p className={ADMIN_ALERT_ERROR}>Failed to load users: {errorMessage}</p>
       ) : null}
 
       <div className={`space-y-4 ${ADMIN_PANEL}`}>
-        <div className="inline-flex flex-wrap items-center gap-2 rounded-2xl border border-slate-700/50 bg-slate-950/60 p-1.5">
+        <div className="inline-flex flex-wrap items-center gap-2 rounded-2xl border border-slate-700/50 bg-slate-950/70 p-1.5">
           <button type="button" onClick={() => setRoleFilter("all")} className={filterButtonClass("all")}>
             All Users
           </button>
@@ -137,24 +132,18 @@ export default function AdminUsersPage() {
           </button>
         </div>
 
-        <div>
-          <label htmlFor="users-search" className="mb-1.5 block text-sm font-semibold text-slate-300">
-            Search users
-          </label>
-          <input
-            id="users-search"
-            type="text"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search by first name, last name, or email"
-            className={ADMIN_INPUT}
-          />
-        </div>
+        <AdminSearchInput
+          id="users-search"
+          label="Search users"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by first name, last name, or email"
+        />
 
         <p className="text-sm text-slate-400">Showing {filteredUsers.length} users</p>
       </div>
 
-      <div className={ADMIN_TABLE_WRAPPER}>
+      <AdminTableWrapper>
         <table className="min-w-full text-left text-sm">
           <thead className={ADMIN_TABLE_HEAD}>
             <tr>
@@ -166,24 +155,15 @@ export default function AdminUsersPage() {
           </thead>
           <tbody>
             {filteredUsers.map((user, index) => (
-              <tr
-                key={user.id}
-                className={`align-top transition-colors duration-150 hover:bg-slate-800/70 ${
-                  index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-900/60"
-                }`}
-              >
+              <tr key={user.id} className={`${ADMIN_TABLE_ROW} ${index % 2 === 0 ? "bg-slate-900/40" : "bg-slate-900/20"}`}>
                 <td className="px-4 py-3.5 text-slate-200">{user.first_name ?? "-"}</td>
                 <td className="px-4 py-3.5 text-slate-200">{user.last_name ?? "-"}</td>
                 <td className="px-4 py-3.5 text-slate-300">{user.email ?? "-"}</td>
                 <td className="px-4 py-3.5">
                   {user.is_superadmin === true ? (
-                    <span className="inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-950/50 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-                      Superadmin
-                    </span>
+                    <span className={ADMIN_BADGE_POSITIVE}>Superadmin</span>
                   ) : (
-                    <span className="inline-flex items-center rounded-full border border-slate-600/60 bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-slate-300">
-                      User
-                    </span>
+                    <span className={ADMIN_BADGE_NEUTRAL}>User</span>
                   )}
                 </td>
               </tr>
@@ -204,7 +184,7 @@ export default function AdminUsersPage() {
             ) : null}
           </tbody>
         </table>
-      </div>
-    </section>
+      </AdminTableWrapper>
+    </AdminPageShell>
   );
 }

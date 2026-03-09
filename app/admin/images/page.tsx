@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { ADMIN_ALERT_ERROR, ADMIN_PAGE_HEADER, ADMIN_PAGE_SUBTITLE, ADMIN_PAGE_TITLE } from "@/components/admin/theme";
+import { ADMIN_ALERT_ERROR } from "@/components/admin/theme";
+import { AdminPageHeader, AdminPageShell } from "@/components/admin/ui";
 import { ImagesAdminClient, type ImageRow } from "./images-admin-client";
 
 export default async function AdminImagesPage() {
@@ -18,19 +19,14 @@ export default async function AdminImagesPage() {
   }));
 
   return (
-    <section className="space-y-6">
-      <div className={ADMIN_PAGE_HEADER}>
-        <h2 className={ADMIN_PAGE_TITLE}>Images</h2>
-        <p className={ADMIN_PAGE_SUBTITLE}>Manage image records in the dataset.</p>
-      </div>
+    <AdminPageShell>
+      <AdminPageHeader title="Images" subtitle="Manage image records in the dataset." />
 
       {error ? (
-        <p className={ADMIN_ALERT_ERROR}>
-          Failed to load images: {error.message}
-        </p>
+        <p className={ADMIN_ALERT_ERROR}>Failed to load images: {error.message}</p>
       ) : null}
 
       <ImagesAdminClient initialRows={rows} />
-    </section>
+    </AdminPageShell>
   );
 }
