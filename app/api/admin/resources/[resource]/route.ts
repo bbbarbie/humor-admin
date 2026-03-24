@@ -65,7 +65,13 @@ export async function POST(request: Request, context: { params: Promise<{ resour
     return NextResponse.json({ error: "Request must include a JSON object in 'values'." }, { status: 400 });
   }
 
-  const { data, error } = await auth.supabase.from(config.table).insert(body.values).select("*").limit(1).maybeSingle();
+  const insertValues = {
+    ...body.values,
+    created_by_user_id: auth.profileId,
+    modified_by_user_id: auth.profileId,
+  };
+
+  const { data, error } = await auth.supabase.from(config.table).insert(insertValues).select("*").limit(1).maybeSingle();
 
   if (error) {
     return NextResponse.json({ error: `Failed to create row: ${error.message}` }, { status: 400 });
@@ -107,9 +113,14 @@ export async function PATCH(request: Request, context: { params: Promise<{ resou
     return NextResponse.json({ error: "Request must include a JSON object in 'values'." }, { status: 400 });
   }
 
+  const updateValues = {
+    ...body.values,
+    modified_by_user_id: auth.profileId,
+  };
+
   const { data, error } = await auth.supabase
     .from(config.table)
-    .update(body.values)
+    .update(updateValues)
     .eq(body.keyColumn, body.keyValue)
     .select("*")
     .limit(1)

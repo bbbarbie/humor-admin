@@ -1,41 +1,19 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-async function requireSuperadmin() {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_superadmin")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.is_superadmin !== true) {
-    redirect("/admin");
-  }
-
-  return supabase;
-}
+import { redirect } from "next/navigation";
+import { requireSuperadminForAction } from "@/lib/admin/require-superadmin-action";
 
 export async function createImageAction(formData: FormData) {
-  const supabase = await requireSuperadmin();
+  const { supabase, profileId } = await requireSuperadminForAction();
 
   const payload = {
-    image_url: String(formData.get("image_url") || "").trim(),
+    url: String(formData.get("url") || "").trim(),
+    created_by_user_id: profileId,
+    modified_by_user_id: profileId,
   };
 
-  if (!payload.image_url) {
+  if (!payload.url) {
     throw new Error("Image URL is required");
   }
 
@@ -51,13 +29,14 @@ export async function createImageAction(formData: FormData) {
 }
 
 export async function updateImageAction(id: string, formData: FormData) {
-  const supabase = await requireSuperadmin();
+  const { supabase, profileId } = await requireSuperadminForAction();
 
   const payload = {
-    image_url: String(formData.get("image_url") || "").trim(),
+    url: String(formData.get("url") || "").trim(),
+    modified_by_user_id: profileId,
   };
 
-  if (!payload.image_url) {
+  if (!payload.url) {
     throw new Error("Image URL is required");
   }
 
@@ -74,7 +53,7 @@ export async function updateImageAction(id: string, formData: FormData) {
 }
 
 export async function deleteImageAction(formData: FormData) {
-  const supabase = await requireSuperadmin();
+  const { supabase } = await requireSuperadminForAction();
 
   const id = String(formData.get("id") || "").trim();
   if (!id) {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireSuperadminForApi } from "@/lib/admin/require-superadmin-api";
 
 type SupabaseImageRow = {
   id: string | number;
@@ -8,39 +8,8 @@ type SupabaseImageRow = {
   url: string | null;
 };
 
-async function requireSuperadmin() {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("is_superadmin")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    return {
-      error: NextResponse.json({ error: `Failed to verify profile: ${profileError.message}` }, { status: 500 }),
-    };
-  }
-
-  if (profile?.is_superadmin !== true) {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
-  }
-
-  return { supabase };
-}
-
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  const auth = await requireSuperadmin();
+  const auth = await requireSuperadminForApi();
   if ("error" in auth) return auth.error;
 
   const { id } = await context.params;
@@ -59,7 +28,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     .from("images")
     .update({
       url,
-      modified_datetime_utc: new Date().toISOString(),
+      modified_by_user_id: auth.profileId,
     })
     .eq("id", id)
     .select("id, created_datetime_utc, modified_datetime_utc, url")
@@ -77,7 +46,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 }
 
 export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
-  const auth = await requireSuperadmin();
+  const auth = await requireSuperadminForApi();
   if ("error" in auth) return auth.error;
 
   const { id } = await context.params;

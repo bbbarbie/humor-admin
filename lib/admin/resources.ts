@@ -82,7 +82,7 @@ export const ADMIN_RESOURCE_CONFIGS: Record<string, AdminResourceConfig> = {
   },
   "caption-examples": {
     slug: "caption-examples",
-    table: "captions_examples",
+    table: "caption_examples",
     title: "Caption Examples",
     subtitle: "Create and edit caption examples in modal forms.",
     mode: "crud",

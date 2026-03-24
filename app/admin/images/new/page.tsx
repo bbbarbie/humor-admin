@@ -11,9 +11,9 @@ export default function NewImagePage() {
 
       <form action={createImageAction} className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
         <label className="block space-y-1">
-          <span className="text-sm font-medium">image_url</span>
+          <span className="text-sm font-medium">url</span>
           <input
-            name="image_url"
+            name="url"
             type="url"
             required
             className="w-full rounded border border-zinc-300 px-3 py-2"

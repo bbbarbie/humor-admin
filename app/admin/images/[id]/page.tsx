@@ -13,7 +13,7 @@ export default async function ImageDetailPage({
 
   const { data: image, error } = await supabase
     .from("images")
-    .select("id, image_url, created_at")
+    .select("id, url, created_datetime_utc")
     .eq("id", id)
     .maybeSingle();
 
@@ -34,12 +34,12 @@ export default async function ImageDetailPage({
 
       <form action={boundUpdateAction} className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
         <label className="block space-y-1">
-          <span className="text-sm font-medium">image_url</span>
+          <span className="text-sm font-medium">url</span>
           <input
-            name="image_url"
+            name="url"
             type="url"
             required
-            defaultValue={image.image_url ?? ""}
+            defaultValue={image.url ?? ""}
             className="w-full rounded border border-zinc-300 px-3 py-2"
           />
         </label>
@@ -58,7 +58,7 @@ export default async function ImageDetailPage({
         </button>
       </form>
 
-      <p className="text-xs text-zinc-500">Created: {image.created_at ?? "-"}</p>
+      <p className="text-xs text-zinc-500">Created: {image.created_datetime_utc ?? "-"}</p>
     </section>
   );
 }

@@ -15,7 +15,7 @@ export async function requireSuperadminForApi() {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("is_superadmin")
+    .select("id, is_superadmin")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -29,5 +29,9 @@ export async function requireSuperadminForApi() {
     return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   }
 
-  return { supabase };
+  if (!profile.id) {
+    return { error: NextResponse.json({ error: "Profile record is missing an id." }, { status: 500 }) };
+  }
+
+  return { supabase, profileId: profile.id };
 }

@@ -3,11 +3,7 @@
 import { useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { formatUtc } from "@/lib/format-utc";
-import {
-  CreateImageForm,
-  type GenerateImageInput,
-  type GeneratedImageCandidate,
-} from "@/components/admin/create-image-form";
+import { CreateImageForm } from "@/components/admin/create-image-form";
 import { ImageThumbnail } from "@/components/admin/image-thumbnail";
 import {
   ADMIN_DANGER_BUTTON,
@@ -41,10 +37,6 @@ type ApiSuccess = {
 
 type ApiError = {
   error?: string;
-};
-
-type GenerateImagesSuccess = {
-  images?: GeneratedImageCandidate[];
 };
 
 function truncateUrl(url: string, max = 60): string {
@@ -163,27 +155,6 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
     }
   }
 
-  async function handleGenerateImages(input: GenerateImageInput): Promise<GeneratedImageCandidate[]> {
-    setMessage(null);
-    setErrorMessage(null);
-
-    try {
-      setLoadingActionId("generate");
-      const response = await fetch("/api/admin/images/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-      const result = (await parseResponse(response)) as GenerateImagesSuccess;
-      return result.images ?? [];
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to generate images.");
-      return [];
-    } finally {
-      setLoadingActionId(null);
-    }
-  }
-
   async function handleSaveEdit(id: PrimitiveId) {
     setMessage(null);
     setErrorMessage(null);
@@ -254,7 +225,7 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="text-lg font-semibold text-slate-100">Create Image</h3>
-            <p className="mt-1 text-sm text-slate-400">Choose URL, upload, or generated candidate.</p>
+            <p className="mt-1 text-sm text-slate-400">Choose URL or upload.</p>
           </div>
           <button
             type="button"
@@ -271,11 +242,8 @@ export function ImagesAdminClient({ initialRows }: { initialRows: ImageRow[] }) 
         {isCreating ? (
           <CreateImageForm
             isBusy={loadingActionId === "create"}
-            isGenerating={loadingActionId === "generate"}
             onCreateFromUrl={handleCreateFromUrl}
             onUploadFile={handleUploadFile}
-            onGenerateImages={handleGenerateImages}
-            onCreateFromGenerated={handleCreateFromUrl}
           />
         ) : null}
       </div>
